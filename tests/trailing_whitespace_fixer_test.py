@@ -19,6 +19,21 @@ def test_fixes_trailing_whitespace(input_s, expected, tmpdir):
     assert path.read() == expected
 
 
+@pytest.mark.parametrize(
+    ('arg', 'expected'),
+    (
+        ('--fix', 'foo\nbar\n'),
+        ('--no-fix', 'foo \nbar \n'),
+    ),
+)
+def test_fix_no_fix(tmpdir, arg, expected):
+    input_s = 'foo \nbar \n'
+    path = tmpdir.join('file.txt')
+    path.write(input_s)
+    assert main((str(path), arg)) == 1
+    assert path.read() == expected
+
+
 def test_ok_no_newline_end_of_file(tmpdir):
     filename = tmpdir.join('f')
     filename.write_binary(b'foo\nbar')

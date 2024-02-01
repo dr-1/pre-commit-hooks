@@ -196,13 +196,14 @@ very specific format.  You must opt in to this by setting [`files`](https://pre-
 
 
 #### `trailing-whitespace`
-Trims trailing whitespace.
+Detects and optionally trims trailing whitespace.
+  - By default, this hook trims all whitespace from the ends of lines.
+    To specify a custom set of characters to trim instead, use `args: [--chars,"<chars to trim>"]`.
+    To only lint files without fixing them, specify `--no-fix`.
   - To preserve Markdown [hard linebreaks](https://github.github.com/gfm/#hard-line-break)
     use `args: [--markdown-linebreak-ext=md]` (or other extensions used
     by your markdownfiles).  If for some reason you want to treat all files
     as markdown, use `--markdown-linebreak-ext=*`.
-  - By default, this hook trims all whitespace from the ends of lines.
-    To specify a custom set of characters to trim instead, use `args: [--chars,"<chars to trim>"]`.
 
 ### Deprecated / replaced hooks
 

@@ -5,18 +5,20 @@ import os
 from typing import Sequence
 
 
-def _fix_file(
+def _process_file(
         filename: str,
         is_markdown: bool,
         chars: bytes | None,
+        fix: bool,
 ) -> bool:
     with open(filename, mode='rb') as file_processed:
         lines = file_processed.readlines()
     newlines = [_process_line(line, is_markdown, chars) for line in lines]
     if newlines != lines:
-        with open(filename, mode='wb') as file_processed:
-            for line in newlines:
-                file_processed.write(line)
+        if fix:
+            with open(filename, mode='wb') as file_processed:
+                for line in newlines:
+                    file_processed.write(line)
         return True
     else:
         return False
@@ -61,10 +63,29 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         '--chars',
         help=(
-            'The set of characters to strip from the end of lines.  '
+            'The set of characters to consider as whitespace at the end of '
+            'lines.  '
             'Defaults to all whitespace characters.'
         ),
     )
+    parser.add_argument(
+        '--fix',
+        action='store_true',
+        help=(
+            'Fix files by stripping detected trailing whitespace.  '
+            'Default: On'
+        ),
+    )
+    parser.add_argument(
+        '--no-fix',
+        dest='fix',
+        action='store_false',
+        help=(
+            'Do not fix files by stripping detected trailing whitespace.  '
+            'Default: Off, meaning files do get fixed.'
+        ),
+    )
+    parser.set_defaults(fix=True)
     parser.add_argument('filenames', nargs='*', help='Filenames to fix')
     args = parser.parse_args(argv)
 
@@ -93,8 +114,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     for filename in args.filenames:
         _, extension = os.path.splitext(filename.lower())
         md = all_markdown or extension in md_exts
-        if _fix_file(filename, md, chars):
-            print(f'Fixing {filename}')
+        if _process_file(filename, md, chars, args.fix):
+            print(('Fixing ' if args.fix else 'Not fixing ') + filename)
             return_code = 1
     return return_code
 
